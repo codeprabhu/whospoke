@@ -172,6 +172,19 @@ parameters, pyannote segmentation 1.5 M, WeSpeaker ResNet-34 6.6 M, IndicConform
 3. **No fine-tuning** (6 GB laptop GPU). All models are used as released.
 4. **Milestone 4** (LLM clean-up of the transcript) comes after the mid-semester review. Its input, the
    speaker-attributed transcript JSON, is already produced.
+5. **Possible extension: a second test set from Nirantar.** About 325 of Nirantar's 490 Hindi speakers are not our
+   test speakers, so conversations could be built from them. We don't, for three reasons:
+   - *Not heard by us is not the same as not heard by the model.* IndicConformer was trained on IndicVoices' train
+     split, and Nirantar's Hindi comes from the same collection. The one local train shard (of 82) already shares 9
+     speakers with it. So this set could favour IndicConformer even more than our current test set, which comes from
+     the valid split.
+   - *Same kind of audio.* Same collection, phone recordings and regions, so it would give roughly the same numbers as
+     the current 72 conversations. A new test set is worth adding only if it is different, as Vaani is.
+   - *Cost.* The 8.5 GB Hindi set (or another Colab job for just those speakers), a rebuild of the conversations,
+     and a full re-evaluation of several GPU hours.
+
+   It becomes worth doing if a model is ever fine-tuned here, or if the course asks for results on every proposal
+   dataset. Before starting, check the speaker overlap against all 82 IndicVoices train shards (D7).
 
 ## Transparency note
 
