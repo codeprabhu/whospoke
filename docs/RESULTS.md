@@ -116,6 +116,8 @@ speaker in the IndicVoices valid split, since those are our test speakers, which
 **11.0 % WER** (4.3 % CER), against 30.2 % (11.9 % CER) for IndicWav2Vec. The ranking is the same, but this is not an
 independent test. Nirantar's Hindi comes from the IndicVoices collection: 923 of its clips are the exact IndicVoices
 valid files, and 165 of its speakers are our test speakers. So, like the IndicVoices column, it flatters IndicConformer.
+We don't use the full 8.5 GB Hindi set. No model is trained here (D5), and the sample already separates the models by
+19 points, so more clips would only narrow the error bars.
 
 **Hinglish output.** The romaniser (rules for Hindi's silent vowels plus a 2,600-word English-loanword lexicon)
 spells **82.0 % of 8,630** English words spoken inside Hindi correctly in English, e.g. `ऑफिस` → `office`,

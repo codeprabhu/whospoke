@@ -39,7 +39,7 @@ are in [docs/RESULTS.md](docs/RESULTS.md).
 |---|---|
 | 1 · Separation | Conv-TasNet: +9.6 dB on overlaps. With the true timeline, splicing separated overlaps cuts heavy-overlap transcript errors from 35.5 % to 27.6 % |
 | 2 · Diarization | Our spectral clustering: DER 20.3 %. GMM: 20.3 %. Off-the-shelf pyannote 3.1: 18.4 %. Ours and pyannote are within error bars |
-| 3 · Transcription | IndicConformer: 21.0 % WER on real-world Vaani audio, vs 38.0 % for IndicWav2Vec. 78 % of English words inside Hindi recognised. 82 % of them spelled correctly in the Hinglish output |
+| 3 · Transcription | IndicConformer: 21.0 % WER on real-world Vaani audio, vs 38.0 % for IndicWav2Vec. 78 % of English words inside Hindi recognised. 82 % of them spelled correctly in the Hinglish output. Same ranking on a Nirantar Hindi sample (11.0 % vs 30.2 %) |
 
 ![Order A vs Order B](results/figures/order_A_vs_B.png)
 
@@ -108,6 +108,7 @@ python scripts/eval_separation.py --split dev         # Stage 1 checkpoint choic
 python scripts/tune_diarization.py                    # Stage 2 settings (dev only) → results/tuned_params.json
 python scripts/tune_separation_policy.py              # how Order B uses separated audio (dev only)
 python scripts/eval_asr.py                            # Stage 3 model choice (Vaani test)
+python scripts/eval_asr_nirantar.py                   # Stage 3 cross-check on Nirantar Hindi (needs the Colab-extracted sample, D7)
 python scripts/eval_separation.py --split test        # Stage 1 on test
 python scripts/evaluate.py --split test               # every system end to end on test
 python scripts/make_report.py                         # tables + figures
@@ -120,6 +121,6 @@ pytest                                                # fast tests; `pytest -m s
 - Test conversations are **simulated** from real speech: real turn-taking, reverberation and phone codecs are not
   modelled. A real broadcast has no ground-truth labels, so it cannot be scored.
 - IndicConformer was trained on IndicVoices, so its IndicVoices numbers are optimistic. That is why the ASR model is
-  chosen on Vaani instead (D19).
+  chosen on Vaani instead (D19). The same applies to Nirantar, whose Hindi comes from the IndicVoices collection (D7).
 - At most two people talk at once. Conv-TasNet separates two voices.
 - The Hinglish romaniser is rule-based plus a lexicon. It is readable, not a standard spelling.
