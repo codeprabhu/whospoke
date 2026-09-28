@@ -34,7 +34,7 @@ Both models were named as options in the project proposal.
   - `cudnn_conv1d_pad_to_nc1d: 1` (prevents cuDNN from selecting a very slow depthwise-conv kernel).
 - **Critical bug fix (D25):** `import speechbrain` (pulled in by pyannote / SepFormer) globally disables TorchScript's profiling executor. The legacy executor then fuses the STFT's complex-valued ops into a runtime-compiled CUDA kernel that crashes on Windows (`c10::complex` not found). Fixed by disabling the TorchScript fuser specifically during the preprocessor call (`_no_jit_fusion` context manager). Features are identical; only speed is affected.
 
-**Code reference:** [`asr_backends.py:IndicConformerASR`](../src/whospoke/asr_backends.py), lines 141–298
+**Code reference:** [`asr_backends.py:IndicConformerASR`](../../src/whospoke/asr_backends.py), lines 141–298
 
 #### IndicWav2Vec-Hindi (AI4Bharat)
 
@@ -42,7 +42,7 @@ Both models were named as options in the project proposal.
 - **Decoding:** Greedy CTC (no language model).
 - **Loading workaround:** The repo only ships `pytorch_model.bin`. Transformers ≥ 4.50 refuses `torch.load` without `weights_only=True` (CVE-2025-32434). The code loads the state dict safely and passes it to `from_pretrained`.
 
-**Code reference:** [`asr_backends.py:IndicWav2VecASR`](../src/whospoke/asr_backends.py), lines 300–354
+**Code reference:** [`asr_backends.py:IndicWav2VecASR`](../../src/whospoke/asr_backends.py), lines 300–354
 
 ### Shared Preprocessing
 
@@ -53,7 +53,7 @@ Both backends share the `_ASRBackend` base class which handles:
 3. **Length-sorted batching:** Utterances are sorted longest-first so each batch has similar lengths (less padding), and the first allocation (the largest) is reused by later, smaller ones.
 4. **Minimum duration:** Clips shorter than 0.1 s are skipped entirely.
 
-**Code reference:** [`asr_backends.py:_ASRBackend`](../src/whospoke/asr_backends.py), lines 101–137
+**Code reference:** [`asr_backends.py:_ASRBackend`](../../src/whospoke/asr_backends.py), lines 101–137
 
 ### Model Selection (D9, D19, D24)
 
@@ -110,7 +110,7 @@ Words not in the lexicon (and not matching common-word overrides) are romanised 
 
 5. **Anusvara (ं) contextual nasal:** The nasal marker is romanised as `m` before labial consonants (p, b, m) and `n` otherwise: `संभव → sambhav`, `हिंदी → hindi`.
 
-**Code reference:** [`hinglish.py`](../src/whospoke/hinglish.py)
+**Code reference:** [`hinglish.py`](../../src/whospoke/hinglish.py)
 
 ### Which Audio Each Turn is Transcribed From
 
@@ -124,18 +124,18 @@ This depends on the pipeline order and separation policy (D26):
 **Order A:**
 - Every turn is transcribed from the **separated track** it was found on.
 
-**Code reference:** [`pipeline.py:Pipeline._targeted_separation()`](../src/whospoke/pipeline.py), lines 237–302
+**Code reference:** [`pipeline.py:Pipeline._targeted_separation()`](../../src/whospoke/pipeline.py), lines 237–302
 
 ### Key Files
 
 | File | Role |
 |---|---|
-| [`src/whospoke/asr_backends.py`](../src/whospoke/asr_backends.py) | IndicConformer and IndicWav2Vec wrappers with batching, chunking, and ONNX/CUDA optimisations |
-| [`src/whospoke/hinglish.py`](../src/whospoke/hinglish.py) | Devanagari → Hinglish romaniser (rules + lexicon) |
-| [`src/whospoke/resources/loanwords.tsv`](../src/whospoke/resources/loanwords.tsv) | 2,600-entry English loanword dictionary |
-| [`scripts/eval_asr.py`](../scripts/eval_asr.py) | Head-to-head ASR model comparison on Vaani |
-| [`scripts/mine_loanwords.py`](../scripts/mine_loanwords.py) | Mines additional loanword pairs from Vaani train |
-| [`results/asr_comparison.csv`](../results/asr_comparison.csv) | Raw ASR comparison numbers |
+| [`src/whospoke/asr_backends.py`](../../src/whospoke/asr_backends.py) | IndicConformer and IndicWav2Vec wrappers with batching, chunking, and ONNX/CUDA optimisations |
+| [`src/whospoke/hinglish.py`](../../src/whospoke/hinglish.py) | Devanagari → Hinglish romaniser (rules + lexicon) |
+| [`src/whospoke/resources/loanwords.tsv`](../../src/whospoke/resources/loanwords.tsv) | 2,600-entry English loanword dictionary |
+| [`scripts/eval_asr.py`](../../scripts/eval_asr.py) | Head-to-head ASR model comparison on Vaani |
+| [`scripts/mine_loanwords.py`](../../scripts/mine_loanwords.py) | Mines additional loanword pairs from Vaani train |
+| [`results/asr_comparison.csv`](../../results/asr_comparison.csv) | Raw ASR comparison numbers |
 
 ### Key Decisions
 

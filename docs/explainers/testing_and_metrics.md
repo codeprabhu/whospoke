@@ -24,7 +24,7 @@ Now we can score every stage precisely.
 
 | Metric | Question it Answers | Analogy |
 |---|---|---|
-| **SI-SDR** (dB, higher = better) | How much cleaner is each voice after separation? | "+10 dB" means the interfering voice is 10× quieter |
+| **SI-SDR** (dB, higher = better) | How much cleaner is each voice after separation? | "+10 dB" means the leftover interference has 10× less power (about 3× lower in amplitude) |
 | **DER** (%, lower = better) | How much speaking time is attributed to the wrong person, missed, or hallucinated? | Like a test score: 20% error means 80% of the timeline is correct |
 | **WER** (%, lower = better) | What fraction of words are wrong? | A spelling test: 21% error means roughly 4 out of 5 words are right |
 | **cpWER** (%, lower = better) | Who said what? — words wrong OR given to the wrong speaker | The ultimate test: you only get credit if both the word and the speaker are correct |
@@ -57,7 +57,7 @@ Now we can score every stage precisely.
    - `reference.rttm` — exact speech activity derived from the clean tracks (not utterance boundaries — actual energy-based VAD on the clean audio, so intra-utterance pauses are excluded).
    - `reference.json` — complete metadata: segments with text, speaker IDs, overlap statistics, the `SynthConfig` that produced it.
 
-**Code reference:** [`synth.py:simulate()`](../src/whospoke/synth.py), lines 195–269; [`synth.py:speech_activity()`](../src/whospoke/synth.py), lines 115–155
+**Code reference:** [`synth.py:simulate()`](../../src/whospoke/synth.py), lines 195–269; [`synth.py:speech_activity()`](../../src/whospoke/synth.py), lines 115–155
 
 **Reference activity (`speech_activity`):** Utterance boundaries from IndicVoices include leading/trailing silence and internal pauses. The reference is therefore computed from the **clean source track**: within each utterance's time span, 20 ms frames louder than 40 dB below the utterance's peak count as speech. Pauses < 0.25 s are bridged; islands < 0.1 s are dropped. This is model-free, so no system is favoured (D14).
 
@@ -90,7 +90,7 @@ where $\alpha = \frac{\langle e, s \rangle}{\|s\|^2}$ is the optimal scaling fac
 
 **Permutation-invariant:** With 2 outputs and 2 references, both assignments are tried and the better one is kept (pit_si_sdr).
 
-**Code reference:** [`metrics.py:si_sdr()`](../src/whospoke/metrics.py), lines 22–29; [`metrics.py:pit_si_sdr()`](../src/whospoke/metrics.py), lines 32–39
+**Code reference:** [`metrics.py:si_sdr()`](../../src/whospoke/metrics.py), lines 22–29; [`metrics.py:pit_si_sdr()`](../../src/whospoke/metrics.py), lines 32–39
 
 #### Stage 2: DER (Diarization Error Rate)
 
@@ -107,7 +107,7 @@ where:
 
 **JER (Jaccard Error Rate):** Same idea but averaged per speaker (so a speaker with little speech is weighted equally). Also computed but DER is the primary metric.
 
-**Code reference:** [`metrics.py:der()`](../src/whospoke/metrics.py), lines 57–70
+**Code reference:** [`metrics.py:der()`](../../src/whospoke/metrics.py), lines 57–70
 
 #### Stage 3: WER / CER
 
@@ -115,9 +115,9 @@ $$\text{WER} = \frac{\text{Levenshtein edit distance (word-level)}}{\text{number
 
 Inputs are normalised: Unicode NFC, punctuation removed, lowercased, single-spaced.
 
-**Code reference:** [`metrics.py:error_counts()`](../src/whospoke/metrics.py), lines 104–111
+**Code reference:** [`metrics.py:error_counts()`](../../src/whospoke/metrics.py), lines 104–111
 
-#### End-to-End: cpWER (Concatenated Polyglot Word Error Rate)
+#### End-to-End: cpWER (concatenated minimum-permutation Word Error Rate, from the CHiME-6 challenge)
 
 The "who said what" metric. It is the only score that requires both the correct words AND the correct speaker attribution.
 
@@ -129,7 +129,7 @@ The "who said what" metric. It is the only score that requires both the correct 
 
 **Why cpWER is harsh:** A word given to the wrong speaker is counted as an error *twice* — it is missing from the correct speaker (a deletion) and extra for the wrong speaker (an insertion). So 10% speaker confusion can easily add 20+ WER points.
 
-**Code reference:** [`metrics.py:cp_error()`](../src/whospoke/metrics.py), lines 133–151
+**Code reference:** [`metrics.py:cp_error()`](../../src/whospoke/metrics.py), lines 133–151
 
 ### Confidence Intervals
 
@@ -159,10 +159,10 @@ The differences between consecutive rows quantify the error contributed by each 
 
 | File | Role |
 |---|---|
-| [`src/whospoke/synth.py`](../src/whospoke/synth.py) | Conversation simulator |
-| [`src/whospoke/noise.py`](../src/whospoke/noise.py) | Village/market soundscape generator |
-| [`src/whospoke/metrics.py`](../src/whospoke/metrics.py) | All metrics: SI-SDR, DER, JER, WER, CER, cpWER |
-| [`scripts/build_dataset.py`](../scripts/build_dataset.py) | Builds dev + test conversations |
-| [`scripts/evaluate.py`](../scripts/evaluate.py) | End-to-end evaluation (all systems × all conversations) |
-| [`scripts/make_report.py`](../scripts/make_report.py) | Generates tables and figures from CSVs |
-| [`results/eval_test_indicconformer.csv`](../results/eval_test_indicconformer.csv) | Every system × every test conversation |
+| [`src/whospoke/synth.py`](../../src/whospoke/synth.py) | Conversation simulator |
+| [`src/whospoke/noise.py`](../../src/whospoke/noise.py) | Village/market soundscape generator |
+| [`src/whospoke/metrics.py`](../../src/whospoke/metrics.py) | All metrics: SI-SDR, DER, JER, WER, CER, cpWER |
+| [`scripts/build_dataset.py`](../../scripts/build_dataset.py) | Builds dev + test conversations |
+| [`scripts/evaluate.py`](../../scripts/evaluate.py) | End-to-end evaluation (all systems × all conversations) |
+| [`scripts/make_report.py`](../../scripts/make_report.py) | Generates tables and figures from CSVs |
+| [`results/eval_test_indicconformer.csv`](../../results/eval_test_indicconformer.csv) | Every system × every test conversation |

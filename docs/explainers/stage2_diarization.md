@@ -32,7 +32,7 @@ Here's how the system does it:
 
 Both thresholds use `min_duration_on = 0.0` and `min_duration_off = 0.0` (no duration-based filtering; all filtering happens later in the timeline construction).
 
-**Code reference:** [`vad.py`](../src/whospoke/vad.py)
+**Code reference:** [`vad.py`](../../src/whospoke/vad.py)
 
 ### Step 2: Speaker Embeddings
 
@@ -40,7 +40,7 @@ Both thresholds use `min_duration_on = 0.0` and `min_duration_off = 0.0` (no dur
 
 **Windowing:** Speech regions are covered with **1.5 s windows, hopped every 0.75 s**. Windows shorter than 0.4 s are skipped. Each window is zero-padded to a common length, passed through WeSpeaker in batches of 32, and produces a **256-dimensional embedding**.
 
-**Code reference:** [`diarization.py:embed()`](../src/whospoke/diarization.py), lines 90–108; [`diarization.py:sliding_windows()`](../src/whospoke/diarization.py), lines 111–126
+**Code reference:** [`diarization.py:embed()`](../../src/whospoke/diarization.py), lines 90–108; [`diarization.py:sliding_windows()`](../../src/whospoke/diarization.py), lines 111–126
 
 ### Step 3: Unsupervised Clustering (Written from Scratch)
 
@@ -51,10 +51,10 @@ Both algorithms take the same input (N embedding vectors) and produce the same o
 1. **Affinity matrix:** Compute all pairwise cosine similarities between L2-normalised embeddings. This gives an N×N matrix $A$ where $A_{ij}$ measures how similar windows $i$ and $j$ sound.
 2. **Row-wise pruning:** For each window, keep only the top $p$% most similar neighbours (default $p = 20\%$); set all other entries to zero. This removes noisy, weak connections. The matrix is then symmetrised: $\hat{A} = \frac{1}{2}(A + A^T)$, and negative values are clipped to zero.
 3. **Graph Laplacian:** Compute the unnormalised Laplacian $L = D - \hat{A}$ where $D$ is the diagonal degree matrix.
-4. **Eigengap for speaker count:** Compute the eigenvalues of $L$ in ascending order. The number of speakers $k$ is the position of the **largest gap** between consecutive eigenvalues (starting from `min_speakers`). If all eigenvalues are very close (i.e. all windows have high mutual similarity > `single_speaker_sim = 0.55`), it concludes there is only one speaker.
+4. **Eigengap for speaker count:** Compute the eigenvalues of $L$ in ascending order. The number of speakers $k$ is the position of the **largest gap** between consecutive eigenvalues (starting from `min_speakers`, capped at 8). A separate check runs *before* building the graph: if 90% of all window pairs have cosine similarity above `single_speaker_sim = 0.55`, it concludes there is only one speaker and stops. (The eigengap alone cannot say "one speaker" reliably.)
 5. **k-Means on eigenvectors:** Take the first $k$ eigenvectors, L2-normalise each row, and run k-means (10 initialisations) to produce the final cluster labels.
 
-**Code reference:** [`clustering.py:SpectralClustering`](../src/whospoke/clustering.py), lines 28–78
+**Code reference:** [`clustering.py:SpectralClustering`](../../src/whospoke/clustering.py), lines 28–78
 
 #### Gaussian Mixture Model (GMM)
 
@@ -62,17 +62,17 @@ Both algorithms take the same input (N embedding vectors) and produce the same o
 2. **Model selection:** Fit diagonal-covariance GMMs with $k = 1, 2, \ldots, K_{\max}$ components (each with 3 initialisations). For each $k$, compute the **Bayesian Information Criterion (BIC):** $\text{BIC} = -2 \ln \hat{L} + p \ln n$, where $\hat{L}$ is the maximised likelihood, $p$ is the number of parameters, and $n$ is the number of data points. BIC penalises complexity, so the $k$ with the lowest BIC balances fit and parsimony.
 3. **Assign labels:** Predict cluster membership with the best GMM.
 
-**Code reference:** [`clustering.py:GMMClustering`](../src/whospoke/clustering.py), lines 81–107
+**Code reference:** [`clustering.py:GMMClustering`](../../src/whospoke/clustering.py), lines 81–107
 
 #### Cluster Clean-Up (Both Methods)
 
-After clustering, two post-processing steps (D17):
+After clustering, three post-processing steps (D17):
 
 1. **Absorb tiny clusters:** Any cluster holding < 3% of the total windows is not a real speaker — it is typically a noisy or heavily overlapped patch. Each of its windows is reassigned to the nearest large cluster (by cosine similarity to cluster centroids).
 2. **Merge near-identical clusters:** If two clusters' mean embeddings have cosine similarity above `merge_sim` (default 0.6), they are the same person split in two. Merged iteratively, most-similar pair first.
 3. **Relabel by first appearance:** Clusters are renamed 0, 1, 2, ... in the order they first appear, so "Speaker_A" is always the first voice heard.
 
-**Code reference:** [`clustering.py:consolidate()`](../src/whospoke/clustering.py), lines 110–138
+**Code reference:** [`clustering.py:consolidate()`](../../src/whospoke/clustering.py), lines 110–138
 
 ### Step 4: Timeline Construction
 
@@ -80,13 +80,13 @@ After clustering, two post-processing steps (D17):
 2. **Smoothing:** Speaker runs shorter than `min_turn` (0.3 s) are absorbed into the longer neighbouring run (up to 3 passes).
 3. **Turn extraction:** Consecutive frames with the same label are merged into Turn objects `(start, end, speaker)`.
 
-**Code reference:** [`diarization.py:_frame_labels()`](../src/whospoke/diarization.py), lines 131–149; [`diarization.py:_smooth()`](../src/whospoke/diarization.py), lines 152–169
+**Code reference:** [`diarization.py:_frame_labels()`](../../src/whospoke/diarization.py), lines 131–149; [`diarization.py:_smooth()`](../../src/whospoke/diarization.py), lines 152–169
 
 ### Step 5: Overlap-Aware Assignment
 
 Where the overlap detector fires, the second speaker is determined by finding the nearest *other* speaker in time (Bullock et al., 2020). Without this step, every overlap is counted as missed speech for the second speaker.
 
-**Code reference:** [`diarization.py:add_overlap_speakers()`](../src/whospoke/diarization.py), lines 185–196
+**Code reference:** [`diarization.py:add_overlap_speakers()`](../../src/whospoke/diarization.py), lines 185–196
 
 ### Order A Variant: Joint Clustering of Separated Tracks
 
@@ -95,7 +95,7 @@ In Order A, the separator produces two tracks *before* diarization. The diarizer
 2. **Clusters all embeddings together** (so a speaker keeps one name even if the separator moves them between tracks).
 3. If the same speaker is found on both tracks at the same time, or one track is much quieter (> 6 dB) than the other while both are active, the weaker copy is treated as **separator leakage** and dropped.
 
-**Code reference:** [`diarization.py:Diarizer.assign_streams()`](../src/whospoke/diarization.py), lines 281–318
+**Code reference:** [`diarization.py:Diarizer.assign_streams()`](../../src/whospoke/diarization.py), lines 281–318
 
 ### Results
 
@@ -115,11 +115,11 @@ In Order A, the separator produces two tracks *before* diarization. The diarizer
 
 | File | Role |
 |---|---|
-| [`src/whospoke/vad.py`](../src/whospoke/vad.py) | VAD + overlap detection (pyannote segmentation-3.0) |
-| [`src/whospoke/diarization.py`](../src/whospoke/diarization.py) | Embeddings, timeline construction, Order A joint clustering |
-| [`src/whospoke/clustering.py`](../src/whospoke/clustering.py) | Spectral clustering + GMM, both from scratch, plus clean-up |
-| [`scripts/tune_diarization.py`](../scripts/tune_diarization.py) | Grid search over clustering settings (dev only) |
-| [`results/tuned_params.json`](../results/tuned_params.json) | Frozen settings from the dev grid search |
+| [`src/whospoke/vad.py`](../../src/whospoke/vad.py) | VAD + overlap detection (pyannote segmentation-3.0) |
+| [`src/whospoke/diarization.py`](../../src/whospoke/diarization.py) | Embeddings, timeline construction, Order A joint clustering |
+| [`src/whospoke/clustering.py`](../../src/whospoke/clustering.py) | Spectral clustering + GMM, both from scratch, plus clean-up |
+| [`scripts/tune_diarization.py`](../../scripts/tune_diarization.py) | Grid search over clustering settings (dev only) |
+| [`results/tuned_params.json`](../../results/tuned_params.json) | Frozen settings from the dev grid search |
 
 ### Key Decisions
 

@@ -50,7 +50,7 @@ git-ignored.
 | Corpus | Used? | Reason |
 |---|---|---|
 | IndicVoices (AI4Bharat) | ✅ Main source | Spontaneous Hindi speech with transcripts + speaker info → builds the test conversations |
-| Project Vaani (IISc/ARTPARK) | ✅ | Real-world noisy Hindi (transcribed part) for ASR testing; its Noise-Event set supplies real village/market noise |
+| Project Vaani (IISc/ARTPARK) | ✅ | Real-world noisy Hindi (transcribed part) for ASR testing, plus its English-word tags for the Hinglish lexicon. Not used for background noise: too little speech-free audio (D11) |
 | Nirantar (AI4Bharat) | ❌ | Distributed only as one ~200 GB archive (5 × 40 GB parts); Hindi cannot be extracted without downloading all of it |
 | AIR-RS-DB | ❌ | No public source found under this name (the proposal's citation for it is blank) |
 

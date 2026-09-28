@@ -47,7 +47,7 @@ $$g_0 \cdot y_0 + g_1 \cdot y_1 \approx x \quad (\text{the input mixture})$$
 
 This is a 2×2 least-squares problem. The Gram matrix $Y Y^T$ is regularised with a small ridge term ($10^{-3} \cdot \text{trace}$) to prevent a near-silent output from being amplified to infinity.
 
-**Code reference:** [`separation.py:_separate_window()`](../src/whospoke/separation.py), lines 72–84.
+**Code reference:** [`separation.py:_separate_window()`](../../src/whospoke/separation.py), lines 72–84.
 
 #### Windowed Processing & Speaker-Consistent Stitching
 
@@ -60,7 +60,7 @@ Recordings are processed in **8-second windows** with a **2-second overlap** (ho
 3. Crossfade using a linear ramp over the 2-second overlap.
 4. A weighted accumulation buffer ensures smooth blending across all windows.
 
-**Code reference:** [`separation.py:separate()`](../src/whospoke/separation.py), lines 86–110.
+**Code reference:** [`separation.py:separate()`](../../src/whospoke/separation.py), lines 86–110.
 
 ### Results
 
@@ -90,11 +90,11 @@ Recordings are processed in **8-second windows** with a **2-second overlap** (ho
 
 | File | Role |
 |---|---|
-| [`src/whospoke/separation.py`](../src/whospoke/separation.py) | The Separator class: model loading, gain fitting, windowed stitching |
-| [`src/whospoke/pipeline.py`](../src/whospoke/pipeline.py) | How separated audio is fed to the ASR (splice mode vs turn mode) |
-| [`scripts/eval_separation.py`](../scripts/eval_separation.py) | Measures SI-SDR improvement on dev/test |
-| [`scripts/tune_separation_policy.py`](../scripts/tune_separation_policy.py) | Chooses how to feed separated audio to ASR (dev only) |
-| [`results/separation_*.csv`](../results/) | Raw SI-SDR numbers per conversation |
+| [`src/whospoke/separation.py`](../../src/whospoke/separation.py) | The Separator class: model loading, gain fitting, windowed stitching |
+| [`src/whospoke/pipeline.py`](../../src/whospoke/pipeline.py) | How separated audio is fed to the ASR (splice mode vs turn mode) |
+| [`scripts/eval_separation.py`](../../scripts/eval_separation.py) | Measures SI-SDR improvement on dev/test |
+| [`scripts/tune_separation_policy.py`](../../scripts/tune_separation_policy.py) | Chooses how to feed separated audio to ASR (dev only) |
+| [`results/separation_*.csv`](../../results/) | Raw SI-SDR numbers per conversation |
 
 ### Key Decisions
 

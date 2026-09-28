@@ -91,7 +91,7 @@ On 72 test conversations:
 | Order B — spectral | **49.5%** | **53.6%** |
 | Order A — spectral | 55.8% | 59.8% |
 
-Per conversation, Order A makes on average **6.7 more cpWER points** of error (95% CI +4.0 to +9.4). It is worse in **50 of the 72** test conversations.
+Per conversation, Order A makes on average **6.7 more cpWER points** of error (95% CI +4.0 to +9.4). It is worse in **50 of the 72** test conversations. (The 6.3-point gap in the table above is between the overall rates; 6.7 is the average of the per-conversation gaps. Both are correct.)
 
 ### Why Order B Works Better — The Technical Argument
 
@@ -138,4 +138,4 @@ The proposal's order (Order A) is fully implemented and fully reported alongside
 | DER (who spoke when) | 26.2% | **20.3%** | Order B by 5.9 pp |
 | SI-SDR improvement | +4.5 dB | **+9.6 dB** | Order B by 5.1 dB |
 | Speed (RTF) | 0.113 | **0.062** | Order B 1.8× faster |
-| Wins (of 72 conversations) | 22 | **50** | Order B |
+| Per conversation (of 72) | worse in 50 | **better in 50** | Order B |
