@@ -51,7 +51,7 @@ git-ignored.
 |---|---|---|
 | IndicVoices (AI4Bharat) | ✅ Main source | Spontaneous Hindi speech with transcripts + speaker info → builds the test conversations |
 | Project Vaani (IISc/ARTPARK) | ✅ | Real-world noisy Hindi (transcribed part) for ASR testing, plus its English-word tags for the Hinglish lexicon. Not used for background noise: too little speech-free audio (D11) |
-| Nirantar (AI4Bharat) | ❌ | Distributed only as one ~200 GB archive (5 × 40 GB parts); Hindi cannot be extracted without downloading all of it |
+| Nirantar (AI4Bharat) | ❌ | Distributed only as one ~198 GB `.tgz` (5 × 39.6 GB parts) with all 22 languages shuffled in one flat folder, so the Hindi files (135.6 h, ~8.5 GB) cannot be pulled out without streaming all of it. Its manifests (checked 2026-09-28) show the Hindi part comes from the same collection as IndicVoices: identical fields, and 165 of the 514 speakers in IndicVoices' Hindi *valid* split (our test speakers, D13) also appear in it. So it would add little new data and risks test-speaker leakage. If needed later, a Colab job could stream the archive and keep only Hindi |
 | AIR-RS-DB | ❌ | No public source found under this name (the proposal's citation for it is blank) |
 
 ## D8 · Proposal named "Conv-TasNet or Demucs"

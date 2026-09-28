@@ -19,11 +19,14 @@ we would like to flag two decisions before the mid-semester review:
    works about twice as well when it only has to handle the overlaps (+9.6 dB vs +4.5 dB SI-SDR). We will present
    both and recommend the second, unless you would prefer we keep the original order as the main pipeline.
 
-2. **Datasets.** We use IndicVoices and Project Vaani. Nirantar is only distributed as a single ~200 GB
-   archive, from which the Hindi portion cannot be extracted separately, and we could not find a public
-   source for AIR-RS-DB. Since real broadcasts have no ground-truth labels, we score the pipeline on
-   conversations assembled from real IndicVoices speech with real background noise, which gives exact
-   labels for every stage.
+2. **Datasets.** We are using IndicVoices and Project Vaani. Nirantar comes as one ~200 GB archive with all
+   the languages mixed together, so we can't download just the Hindi part. We also went through its
+   metadata, and the Hindi part seems to come from the same collection as IndicVoices. It has the same
+   fields, and 165 of the 514 speakers in the IndicVoices Hindi validation set (which our test conversations
+   are built from) also appear in it, so it wouldn't add much new data for us. We couldn't find a public
+   source for AIR-RS-DB. Since real broadcasts don't come with labels, we test the pipeline on
+   conversations we put together from real IndicVoices speech and real background noise, so we know
+   exactly who said what and when.
 
 The LLM post-processing stage (Milestone 4) is planned for after the review. Please let us know if you
 would like either decision changed.
