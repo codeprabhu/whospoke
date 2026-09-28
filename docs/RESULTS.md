@@ -110,6 +110,13 @@ Per conversation, splicing removes on average 3.0 points of error (paired CI +1.
 IndicConformer's IndicVoices number is flattered, because it was trained on IndicVoices. That is why the choice
 was made on Vaani, which neither model has seen. It wins there by 17 points.
 
+**Nirantar cross-check** (`scripts/eval_asr_nirantar.py`). A teammate streamed the whole ~198 GB Nirantar archive on
+Colab and kept only Hindi (64,597 clips, 135.6 h, 490 speakers). From a random 800-clip sample we dropped every
+speaker in the IndicVoices valid split, since those are our test speakers, which left 406 clips (0.91 h). On these, IndicConformer scores
+**11.0 % WER** (4.3 % CER), against 30.2 % (11.9 % CER) for IndicWav2Vec. The ranking is the same, but this is not an
+independent test. Nirantar's Hindi comes from the IndicVoices collection: 923 of its clips are the exact IndicVoices
+valid files, and 165 of its speakers are our test speakers. So, like the IndicVoices column, it flatters IndicConformer.
+
 **Hinglish output.** The romaniser (rules for Hindi's silent vowels plus a 2,600-word English-loanword lexicon)
 spells **82.0 % of 8,630** English words spoken inside Hindi correctly in English, e.g. `ऑफिस` → `office`,
 `मोबाइल` → `mobile`, `मीटिंग` → `meeting`. Words missing from the lexicon fall back to the rules and come out

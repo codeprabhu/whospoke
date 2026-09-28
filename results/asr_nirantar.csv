@@ -1,0 +1,3 @@
+model,set,n,hours,wer,cer
+indicconformer,nirantar-hi-sample,406,0.91,0.11011260285838025,0.043300929191327546
+indicwav2vec,nirantar-hi-sample,406,0.91,0.3018622780424426,0.11941488546106903

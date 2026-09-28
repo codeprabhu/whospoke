@@ -1,0 +1,40 @@
+{
+ "sample_clips": 800,
+ "scored_clips": 406,
+ "scored_speakers": 215,
+ "full_hindi": {
+  "clips": 64597,
+  "hours": 135.6,
+  "speakers": 490
+ },
+ "overlap_with_indicvoices": {
+  "valid": {
+   "indicvoices_speakers": 514,
+   "shared_speakers": 165,
+   "nirantar_clips_with_identical_filename": 923
+  },
+  "train_local_shards": {
+   "indicvoices_speakers": 521,
+   "shared_speakers": 9,
+   "nirantar_clips_with_identical_filename": 0
+  }
+ },
+ "table": [
+  {
+   "model": "indicconformer",
+   "set": "nirantar-hi-sample",
+   "n": 406,
+   "hours": 0.91,
+   "wer": 0.11011260285838025,
+   "cer": 0.043300929191327546
+  },
+  {
+   "model": "indicwav2vec",
+   "set": "nirantar-hi-sample",
+   "n": 406,
+   "hours": 0.91,
+   "wer": 0.3018622780424426,
+   "cer": 0.11941488546106903
+  }
+ ]
+}

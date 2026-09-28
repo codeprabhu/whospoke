@@ -23,7 +23,11 @@ we would like to flag two decisions before the mid-semester review:
    the languages mixed together, so we can't download just the Hindi part. We also went through its
    metadata, and the Hindi part seems to come from the same collection as IndicVoices. It has the same
    fields, and 165 of the 514 speakers in the IndicVoices Hindi validation set (which our test conversations
-   are built from) also appear in it, so it wouldn't add much new data for us. We couldn't find a public
+   are built from) also appear in it. Some of the files are even identical. Still, one of us ran a Colab job
+   that went through the whole archive and kept only the Hindi (about 135 hours). We tested both ASR models
+   on a sample of it, after removing our test speakers. IndicConformer got 11.0% WER and IndicWav2Vec
+   30.2%, the same ranking as on Vaani. Since it's the same collection as IndicVoices, we use it only as an
+   extra check and not to build test conversations. We couldn't find a public
    source for AIR-RS-DB. Since real broadcasts don't come with labels, we test the pipeline on
    conversations we put together from real IndicVoices speech and real background noise, so we know
    exactly who said what and when.
