@@ -26,3 +26,6 @@ results/runs/
 
 # Local Claude Code state
 .claude/
+
+# Explainer docs are kept local only, not pushed to GitHub
+docs/explainers/
