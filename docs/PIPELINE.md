@@ -114,6 +114,31 @@ how many of the English words spoken inside Hindi sentences come out exactly rig
 
 ---
 
+## Stage 4 — Semantic post-processing & structuring (`llm_postprocess.py`)
+
+**Job.** Turn the raw Stage-3 speaker-attributed transcript into a concise human-readable report without changing the acoustic evidence.
+
+**Model path.** The default backend is an OpenAI-compatible local HTTP client configured for AI4Bharat **Airavata**, a 7B Hindi instruction-tuned model. The [Airavata model card](https://huggingface.co/ai4bharat/Airavata) documents local `llama.cpp` serving and an instruction/chat format.
+
+**Input.** `transcript.json` from Stage 3, including speaker labels, timestamps, Devanagari ASR text and Hinglish text.
+
+**Prompt guardrails.** The system prompt tells the model to:
+- use only the transcript as evidence;
+- preserve every source line exactly once;
+- preserve speaker IDs and timestamps;
+- repair only obvious ASR/punctuation issues and otherwise mark uncertainty;
+- produce faithful English translations without adding information;
+- create action items only when an explicit request/instruction/commitment is present.
+
+**Schema.** Stage 4 returns structured JSON containing:
+`title`, `topic`, `executive_summary`, `key_points`, `keywords`, `action_items`, `cleaned_dialogue`, and `uncertain_lines`. Every dialogue item carries its source `line_id`.
+
+**Validation.** The Python layer parses the response, removes hallucinated line IDs, restores any omitted source lines from Stage 3, overwrites any model-supplied speaker/timestamp changes with the immutable source values, validates action-item evidence IDs, and writes the original transcript hash into the report provenance. This means a malformed LLM response degrades to a flagged source line instead of silently changing the conversation timeline.
+
+**Long recordings.** The transcript is split into bounded character-sized chunks for cleaning. A second guarded LLM call combines chunk summaries, keywords and evidence-linked actions into the final executive report.
+
+**Outputs.** `report.json` is the machine-readable deliverable; `report.md` is the polished human-readable report with executive summary, topic, key points, keywords, action items, cleaned speaker dialogue, English translations and uncertainty notes.
+
 ## How errors cascade (proposal objective 5)
 
 `scripts/evaluate.py` runs *oracle* versions of the pipeline that replace one stage with the truth:
@@ -138,3 +163,5 @@ The differences between consecutive rows are the error contributed by each stage
 | `transcript_hinglish.txt` | same, romanised |
 | `transcript.srt` | subtitles (play the audio with them in VLC) |
 | `transcript.json` | everything above + per-stage timings and GPU memory |
+| `report.json` | Stage-4 structured semantic report (only when post-processing is enabled) |
+| `report.md` | Stage-4 human-readable report (only when post-processing is enabled) |

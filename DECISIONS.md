@@ -239,3 +239,9 @@ transparency.
 With the true timeline it removes about a fifth of the heavy-overlap errors (44.1 % → 36.2 %). With our own diarization
 the gain is small, because diarization mistakes (words credited to the wrong speaker) then dominate the error.
 
+
+## D27 · Milestone 4 uses a guarded local Airavata backend
+**Decided:** 2026-10-01
+**Choice:** implement Stage 4 as a provider-independent post-processing layer with an OpenAI-compatible local HTTP backend, configured by default for AI4Bharat Airavata. Airavata is instruction-tuned for Hindi/English and is documented for local `llama.cpp` serving. The code does not require an `openai` Python package or a hosted API.
+**Guardrail:** Stage-3 speaker IDs and timestamps are immutable source evidence. The LLM may clean obvious ASR fragments, translate, summarise, extract grounded keywords and explicit actions, but cannot change the timeline. Every source line must appear exactly once; missing lines are restored and flagged. Hallucinated line IDs are discarded.
+**Reason:** a 7B BF16 model is too large to treat as a normal in-process CUDA model on the project's 6 GB laptop GPU. A quantized local server keeps inference practical while preserving the proposal's localized-LLM requirement.

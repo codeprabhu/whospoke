@@ -46,6 +46,8 @@ class Result:
     timings: dict[str, float] = field(default_factory=dict)
     gpu_peak_mb: dict[str, float] = field(default_factory=dict)
     duration_s: float = 0.0
+    report: dict | None = None          # Milestone 4 LLM report (optional; disabled by default)
+    report_markdown: str | None = None
 
     def text_by_speaker(self) -> dict[str, str]:
         out: dict[str, list[str]] = {}
@@ -79,6 +81,10 @@ class Result:
             "gpu_peak_mb": self.gpu_peak_mb, "speakers": self.diarization.speakers,
             "lines": [asdict(l) for l in sorted(self.lines, key=lambda l: l.start)],
         }, ensure_ascii=False, indent=1), encoding="utf-8")
+        if self.report is not None:
+            (out / "report.json").write_text(json.dumps(self.report, ensure_ascii=False, indent=2), encoding="utf-8")
+            if self.report_markdown:
+                (out / "report.md").write_text(self.report_markdown, encoding="utf-8")
         return out
 
 
@@ -164,7 +170,7 @@ class Pipeline:
     def __init__(self, order: str = "B", separator: str | None = "convtasnet",
                  diarizer: Diarizer | PyannoteDiarizer | None = None, asr: str = "indicconformer",
                  max_segment_s: float = 25.0, device: str | None = None, asr_model=None,
-                 sep_mode: str = "splice", sep_context_s: float = 0.5):
+                 sep_mode: str = "splice", sep_context_s: float = 0.5, postprocessor=None):
         if order not in ("A", "B"):
             raise ValueError("order must be 'A' or 'B'")
         if order == "A" and separator is None:
@@ -179,6 +185,7 @@ class Pipeline:
             raise ValueError("sep_mode must be 'splice' or 'turn'")
         self.sep_mode = sep_mode
         self.sep_context_s = sep_context_s
+        self.postprocessor = postprocessor
 
     @property
     def name(self) -> str:
@@ -188,11 +195,16 @@ class Pipeline:
     def warmup(self) -> None:
         """Load every model once so that timings measure processing, not loading."""
         x = (np.random.default_rng(0).standard_normal(3 * SR) * 0.01).astype(np.float32)
-        self.run(x)
+        self.run(x, postprocess=False)
 
     # ------------------------------------------------------------------ main entry point
-    def run(self, wav: np.ndarray, n_speakers: int | None = None, diarization: Diarization | None = None) -> Result:
-        """Process a 16 kHz mono recording. ``diarization`` may be supplied (oracle experiments)."""
+    def run(self, wav: np.ndarray, n_speakers: int | None = None, diarization: Diarization | None = None,
+            postprocess: bool | None = None) -> Result:
+        """Process a 16 kHz mono recording. ``diarization`` may be supplied (oracle experiments).
+
+        ``postprocess`` controls Milestone 4. It defaults to whether a postprocessor was supplied
+        to the constructor, preserving the Stage-1–3 behaviour for existing callers.
+        """
         wav = np.asarray(wav, np.float32)
         res = Result(self.order, Diarization([]), [], duration_s=round(len(wav) / SR, 3))
         t0 = time.perf_counter()
@@ -212,6 +224,19 @@ class Pipeline:
                 units = self._targeted_separation(wav, res.diarization)
             with _Stage(res, "asr"):
                 res.lines = self._transcribe(units)
+        do_postprocess = self.postprocessor is not None if postprocess is None else postprocess
+        if do_postprocess:
+            if self.postprocessor is None:
+                raise ValueError("postprocess=True requires a Stage-4 postprocessor")
+            with _Stage(res, "llm_postprocess"):
+                transcript = {
+                    "order": res.order, "duration_s": res.duration_s, "timings_s": res.timings,
+                    "gpu_peak_mb": res.gpu_peak_mb, "speakers": res.diarization.speakers,
+                    "lines": [asdict(l) for l in sorted(res.lines, key=lambda l: l.start)],
+                }
+                report = self.postprocessor.process_transcript(transcript)
+                res.report = report.to_dict()
+                res.report_markdown = report.markdown()
         res.timings["total"] = round(time.perf_counter() - t0, 3)
         return res
 

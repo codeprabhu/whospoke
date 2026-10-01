@@ -11,6 +11,7 @@ Start with [README.md](README.md) (what this is, headline results, how to run it
 | 3 | [DEVIATIONS.md](DEVIATIONS.md) | Every place we differ from the professor's proposal, and why |
 | 4 | [DECISIONS.md](DECISIONS.md) | Every judgement call (D1–D26), recorded as it was made |
 | 5 | [docs/PIPELINE.md](docs/PIPELINE.md) | Technical reference: how each stage works, stage by stage |
+| [docs/MILESTONE4.md](docs/MILESTONE4.md) | Stage-4 prompt, guardrail and execution reference |
 | 6 | [docs/RESULTS_TABLES.md](docs/RESULTS_TABLES.md) | Raw result tables with 95 % confidence intervals (generated, not hand-written) |
 | 7 | [Audio_Engineering_AI_Project_Proposal.docx](Audio_Engineering_AI_Project_Proposal.docx) | The original brief |
 
@@ -36,6 +37,7 @@ Start with [README.md](README.md) (what this is, headline results, how to run it
 | `clustering.py` | 2 | Spectral clustering and GMM, written from scratch, plus cluster clean-up |
 | `asr_backends.py` | 3 | IndicConformer and IndicWav2Vec speech recognisers |
 | `hinglish.py` | 3 | Devanagari → Hinglish (Latin) romaniser with an English-loanword lexicon |
+| `llm_postprocess.py` | 4 | Guarded LLM clean-up, translation, summary, keywords and action extraction |
 | `resources/loanwords.tsv` | 3 | 2,600 Devanagari → English spellings (hand-made + mined from Vaani *train*) |
 | `metrics.py` | eval | SI-SDR, DER, JER, WER/CER, cpWER (who-said-what error) |
 | `synth.py` | eval | Builds test conversations from real speech with exact labels |
@@ -58,6 +60,7 @@ Start with [README.md](README.md) (what this is, headline results, how to run it
 | `make_report.py` | `docs/RESULTS_TABLES.md` + `results/figures/*.png` |
 | `build_notebooks.py` | `notebooks/*.ipynb` (executed) |
 | `bench_asr_backends.py` | `results/asr_backend_bench.json` — ASR decoding-mode benchmark |
+| `postprocess.py` | Stage-3 `transcript.json` → Stage-4 `report.json` + `report.md` |
 
 ## Tests — `tests/`
 
@@ -75,3 +78,4 @@ Start with [README.md](README.md) (what this is, headline results, how to run it
 | `eval_test_indicconformer/*.json` | Every system's full transcript for every test conversation |
 | `figures/` | Figures used in RESULTS.md and the slides |
 | `demo/` | Example output of one full run (timeline, transcripts, subtitles) |
+| `runs/<name>/report.{json,md}` | Stage-4 semantic report when `--postprocess` is enabled |

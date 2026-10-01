@@ -18,8 +18,8 @@ background, and it produces:
 a speaker timeline (`timeline.json`), a Devanagari transcript, a Hinglish transcript and subtitles (`.srt`).
 (The excerpt is real output on a test conversation with heavy overlap and loud market noise; see [results/demo/](results/demo/).)
 
-This covers Milestones 1–3 of the [project proposal](Audio_Engineering_AI_Project_Proposal.docx).
-Milestone 4 (LLM clean-up) comes after the mid-semester review. **Navigation: [INDEX.md](INDEX.md).**
+This covers all four Milestones of the [project proposal](Audio_Engineering_AI_Project_Proposal.docx).
+Milestone 4 adds conservative LLM clean-up, translation, topic/keyword extraction and actionable-information extraction. **Navigation: [INDEX.md](INDEX.md).**
 
 ---
 
@@ -40,6 +40,7 @@ are in [docs/RESULTS.md](docs/RESULTS.md).
 | 1 · Separation | Conv-TasNet: +9.6 dB on overlaps. With the true timeline, splicing separated overlaps cuts heavy-overlap transcript errors from 35.5 % to 27.6 % |
 | 2 · Diarization | Our spectral clustering: DER 20.3 %. GMM: 20.3 %. Off-the-shelf pyannote 3.1: 18.4 %. Ours and pyannote are within error bars |
 | 3 · Transcription | IndicConformer: 21.0 % WER on real-world Vaani audio, vs 38.0 % for IndicWav2Vec. 78 % of English words inside Hindi recognised. 82 % of them spelled correctly in the Hinglish output. Same ranking on a Nirantar Hindi sample (11.0 % vs 30.2 %) |
+| 4 · LLM post-processing | Airavata turns the Stage-3 JSON into a guarded report: cleaned dialogue, faithful English translation, topic, executive summary, keywords, key points and evidence-linked action items |
 
 ![Order A vs Order B](results/figures/order_A_vs_B.png)
 
@@ -73,6 +74,7 @@ It also runs on Google Colab: see [notebooks/02_walkthrough.ipynb](notebooks/02_
 python -m venv venv && venv\Scripts\activate          # (Linux/macOS: source venv/bin/activate)
 pip install torch==2.5.1 torchaudio==2.5.1 --index-url https://download.pytorch.org/whl/cu121
 pip install -r requirements.txt
+pip install -e .
 pip install --no-deps asteroid==0.7.0 onnxruntime-gpu==1.19.2
 ```
 
@@ -89,10 +91,39 @@ Noise comes from [DEMAND](https://zenodo.org/records/1227121) (CC-BY-4.0) and [E
 **Data folder.** Corpora and simulated conversations (≈5 GB) go to `project/data` by default. To put them somewhere else,
 set `WHOSPOKE_DATA` or write the path into a one-line `data_location.txt`.
 
+### Milestone 4 — local Airavata
+
+Stage 4 uses a local OpenAI-compatible HTTP endpoint. AI4Bharat documents Airavata as a 7B Hindi instruction-tuned model and documents serving it with `llama.cpp` ([model card](https://huggingface.co/ai4bharat/Airavata)); this keeps the project local and avoids putting the 7B BF16 weights directly into the 6 GB laptop GPU.
+
+Install `llama.cpp`, then start Airavata locally (the exact launcher varies by build):
+
+```bash
+llama serve -hf ai4bharat/Airavata
+```
+
+The Stage-4 client expects the server at `http://127.0.0.1:8080/v1` by default. It sends a system prompt plus the Stage-3 transcript and accepts only validated JSON. The [Airavata model card](https://huggingface.co/ai4bharat/Airavata) gives its instruction format and local-serving options.
+
+For an existing Stage-3 run:
+
+```bash
+python -m whospoke postprocess results/demo/transcript.json
+# or
+python scripts/postprocess.py results/demo/transcript.json --out results/demo/milestone4
+```
+
+For the complete pipeline:
+
+```bash
+python -m whospoke run my_recording.wav --postprocess
+```
+
+Stage 4 writes `report.json` and `report.md`. Every cleaned dialogue row retains the original Stage-3 speaker and timestamps; omitted or malformed LLM rows are restored from the source transcript and flagged rather than silently discarded.
+
 ## Run it
 
 ```bash
 python -m whospoke run my_recording.wav                 # Order B, spectral clustering, IndicConformer
+python -m whospoke run my_recording.wav --postprocess  # same run, plus Milestone 4 report
 python -m whospoke run my_recording.wav --order A --clustering gmm --asr indicwav2vec --speakers 2
 ```
 

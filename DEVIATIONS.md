@@ -5,8 +5,8 @@ evidence backs the change. Anything not listed here is implemented as the propos
 Decision numbers (D#) point to the full reasoning in [DECISIONS.md](DECISIONS.md).
 
 **Scope for the mid-semester review:** Milestones 1–3 (separation, diarization, regional & code-switched
-transcription) plus the benchmark notebook. Milestone 4 (LLM post-processing with Airavata/OpenHathi) is
-scheduled after the review; the Stage-3 transcript JSON is already the input format it will consume.
+transcription) plus the benchmark notebook. Milestone 4 (LLM post-processing with Airavata/OpenHathi) was intentionally
+left for after the review; it is now implemented and consumes the Stage-3 transcript JSON.
 
 | # | Proposal says | We did | Why | Severity |
 |---|---|---|---|---|
@@ -19,4 +19,4 @@ scheduled after the review; the Stage-3 transcript JSON is already the input for
 | 7 | "IndicASR **or** IndicWav2Vec" | **Both** evaluated; the better one on independent real-world audio (Vaani) is the default | (D9) | None |
 | 8 | "native scripts **or** standardized Latin representations" | Both: Devanagari transcript (scored) **and** a Hinglish (Latin) transcript | (D10, D19) | None |
 | 9 | Background noise (not specified) | "Village" and "market" soundscapes from DEMAND + ESC-50 | Vaani recordings contain almost no speech-free audio to harvest noise from (D11) | None — the proposal names no noise source |
-| 10 | Stage 4: LLM post-processing | Not built yet | Planned after the mid-semester review, as agreed within the team | Timing only |
+| 10 | Stage 4: LLM post-processing | **Implemented** with Airavata-compatible local LLM client, structured JSON output and validation guardrails | Added after the mid-semester review. Uses a local OpenAI-compatible server so the 7B model can run through quantized llama.cpp without changing the Stage-1–3 model environment | None |
